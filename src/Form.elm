@@ -74,8 +74,64 @@ viewInput t p v toMsg =
 
 viewValidation : Model -> Html msg
 viewValidation model =
-    if model.password == model.passwordAgain then
+    if isSameString model && isEnouphLength model && isComplexPassword model then
         div [ style "color" "green" ] [ text "OK" ]
+
+    else if isEnouphLength model == False then
+        div [ style "color" "red" ] [ text "Password's length must over 8 !" ]
+
+    else if isComplexPassword model == False then
+        div [ style "color" "red" ] [ text "Password must contain upper and lower case letters and numbers." ]
 
     else
         div [ style "color" "red" ] [ text "Passwords do not match!" ]
+
+
+isSameString : Model -> Bool
+isSameString { password, passwordAgain } =
+    password == passwordAgain
+
+
+isEnouphLength : Model -> Bool
+isEnouphLength { password } =
+    if String.length password > 8 then
+        True
+
+    else
+        False
+
+
+isComplexPassword : Model -> Bool
+isComplexPassword { password } =
+    if List.any isNum (String.toList password) && List.any isLowerCase (String.toList password) && List.any isUpperCase (String.toList password) then
+        True
+
+    else
+        False
+
+
+isNum : Char -> Bool
+isNum c =
+    if '0' <= c && c <= '9' then
+        True
+
+    else
+        False
+
+
+isLowerCase : Char -> Bool
+isLowerCase c =
+    if 'a' <= c && c <= 'z' then
+        True
+
+    else
+        False
+
+
+isUpperCase : Char -> Bool
+isUpperCase c =
+    if 'A' <= c && c <= 'Z' then
+        True
+
+    else
+        False
