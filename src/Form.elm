@@ -22,12 +22,13 @@ type alias Model =
     { name : String
     , password : String
     , passwordAgain : String
+    , age : String
     }
 
 
 init : Model
 init =
-    Model "" "" ""
+    Model "" "" "" ""
 
 
 
@@ -38,6 +39,7 @@ type Msg
     = Name String
     | Password String
     | PasswordAgain String
+    | Age String
 
 
 update : Msg -> Model -> Model
@@ -49,8 +51,11 @@ update msg model =
         Password password ->
             { model | password = password }
 
-        PasswordAgain password ->
-            { model | passwordAgain = password }
+        PasswordAgain passwordAgain ->
+            { model | passwordAgain = passwordAgain }
+
+        Age age ->
+            { model | age = age }
 
 
 
@@ -63,6 +68,7 @@ view model =
         [ viewInput "text" "Name" model.name Name
         , viewInput "password" "Password" model.password Password
         , viewInput "password" "Re-enter Password" model.passwordAgain PasswordAgain
+        , viewInput "age" "age" model.age Age
         , viewValidation model
         ]
 
@@ -74,7 +80,7 @@ viewInput t p v toMsg =
 
 viewValidation : Model -> Html msg
 viewValidation model =
-    if isSameString model && isEnouphLength model && isComplexPassword model then
+    if isSameString model && isEnouphLength model && isComplexPassword model && isCorrectAge model then
         div [ style "color" "green" ] [ text "OK" ]
 
     else if isEnouphLength model == False then
@@ -82,6 +88,9 @@ viewValidation model =
 
     else if isComplexPassword model == False then
         div [ style "color" "red" ] [ text "Password must contain upper and lower case letters and numbers." ]
+
+    else if isCorrectAge model == False then
+        div [ style "color" "red" ] [ text "Enter correct age." ]
 
     else
         div [ style "color" "red" ] [ text "Passwords do not match!" ]
@@ -99,6 +108,11 @@ isEnouphLength { password } =
 
     else
         False
+
+
+isCorrectAge : Model -> Bool
+isCorrectAge { age } =
+    String.toInt age /= Nothing
 
 
 isComplexPassword : Model -> Bool
