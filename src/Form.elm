@@ -3,7 +3,7 @@ module Main exposing (Model, Msg(..), init, main, update, view, viewInput, viewV
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onClick, onInput)
 
 
 
@@ -23,12 +23,14 @@ type alias Model =
     , password : String
     , passwordAgain : String
     , age : String
+    , message : String
+    , color : String
     }
 
 
 init : Model
 init =
-    Model "" "" "" ""
+    Model "" "" "" "" "" ""
 
 
 
@@ -40,6 +42,7 @@ type Msg
     | Password String
     | PasswordAgain String
     | Age String
+    | CheckInput
 
 
 update : Msg -> Model -> Model
@@ -57,6 +60,9 @@ update msg model =
         Age age ->
             { model | age = age }
 
+        CheckInput ->
+            viewValidation model
+
 
 
 -- VIEW
@@ -69,7 +75,8 @@ view model =
         , viewInput "password" "Password" model.password Password
         , viewInput "password" "Re-enter Password" model.passwordAgain PasswordAgain
         , viewInput "age" "age" model.age Age
-        , viewValidation model
+        , button [ onClick CheckInput ] [ text "register" ]
+        , div [ style "color" model.color ] [ text model.message ]
         ]
 
 
@@ -78,22 +85,22 @@ viewInput t p v toMsg =
     input [ type_ t, placeholder p, value v, onInput toMsg ] []
 
 
-viewValidation : Model -> Html msg
+viewValidation : Model -> Model
 viewValidation model =
     if isSameString model && isEnouphLength model && isComplexPassword model && isCorrectAge model then
-        div [ style "color" "green" ] [ text "OK" ]
+        { model | color = "green", message = "OK" }
 
     else if isEnouphLength model == False then
-        div [ style "color" "red" ] [ text "Password's length must over 8 !" ]
+        { model | color = "red", message = "Password's length must over 8 !" }
 
     else if isComplexPassword model == False then
-        div [ style "color" "red" ] [ text "Password must contain upper and lower case letters and numbers." ]
+        { model | color = "red", message = "Password must contain upper and lower case letters and numbers." }
 
     else if isCorrectAge model == False then
-        div [ style "color" "red" ] [ text "Enter correct age." ]
+        { model | color = "red", message = "Enter correct age." }
 
     else
-        div [ style "color" "red" ] [ text "Passwords do not match!" ]
+        { model | color = "red", message = "Passwords do not match!" }
 
 
 isSameString : Model -> Bool
